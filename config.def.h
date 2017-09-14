@@ -82,16 +82,40 @@ char termname[] = "st-git-256color";
  */
 static unsigned int tabspaces = 8;
 
-/* bg opacity */
-unsigned int alpha = 0xcc;
-
 /* Terminal colors (16 first used in escape sequence) */
 const char *colorname[] = {
-  /* 8 normal colors */
+  [0] = "#000000", /* black nord2 */
+  [1] = "#BF616A", /* red nord11 */
+  [2] = "#A3BE8C", /* brgreen nord14 */
+  [3] = "#EBCB8B", /* yellow nord13 */ 
+  [4] = "#5E81AC", /* blue nord7 */
+  [5] = "#B48EAD", /* purple nord15 */
+  [6] = "#8FBCBB", /* blue nord5 */
+  [7] = "#E5E9F0", /* green nord10*/
+  /* 8 bright colors */
+  [8]  = "#88C0D0", /* teal nord8 */
+  [9]  = "#81A1C1", /* lblue nord9 */
+  [10] = "#ECEFF4", /* white1 nord6 */
+  [11] = "#3B4252", /* grey2 nord1 */
+  [12] = "#D08770", /* orange nord12 */
+  [13] = "#4C566A", /* grey3 nord3 */
+  [14] = "#2E3440", /* grey1   nord0 */
+  [15] = "#D8Dee9", /* white3  nord4 */ 
+
+  /* special colors */
+  [256] = "#362834", /* background nord0 */
+  [257] = "#D8DEE9", /* foreground  nord4 */
+};
+
+
+
+/* Terminal colors for alternate solarized dark palette */
+const char *altcolorname[] = {
+	/* dracula theme */
   [0] = "#000000", /* black   */
   [1] = "#ff5555", /* red     */
   [2] = "#50fa7b", /* green   */
-  [3] = "#f1fa8c", /* yellow  */
+  [3] = "#f1fa8c", /* yellow  f1fa8c*/ 
   [4] = "#bd93f9", /* blue    */
   [5] = "#ff79c6", /* magenta */
   [6] = "#8be9fd", /* cyan    */
@@ -103,41 +127,13 @@ const char *colorname[] = {
   [10] = "#50fa7b", /* green   */
   [11] = "#f1fa8c", /* yellow  */
   [12] = "#bd93f9", /* blue    */
- [13] = "#ff79c6", /* magenta */
+  [13] = "#ff79c6", /* magenta */
   [14] = "#8be9fd", /* cyan    */
   [15] = "#ffffff", /* white   */
 
   /* special colors */
-  [256] = "#282a36", /* background */
+  [256] = "#282A36", /* background */
   [257] = "#f8f8f2", /* foreground */
-};
-
-
-
-/* Terminal colors for alternate solarized dark palette */
-const char *altcolorname[] = {
-	/* solarized light */
-	"#042c22",  /*  0: black  073642  */
-	"#dc322f",  /*  1: red      */
-	"#859900",  /*  2: green    */
-	"#b58900",  /*  3: yellow   */
-	"#268bd2",  /*  4: blue     */
-	"#d33682",  /*  5: magenta  */
-	"#2aa198",  /*  6: cyan     */
-	"#eee8d5",  /*  7: white    */
-	"#00728e",  /*  8: brblack  002b36 */
-	"#cb4b16",  /*  9: brred    */
-	"#586e75",  /* 10: brgreen  */
-	"#657b83",  /* 11: bryellow */
-	"#839496",  /* 12: brblue   */
-	"#6c71c4",  /* 13: brmagenta*/
-	"#93a1a1",  /* 14: brcyan   */
-	"#fdf6e3",  /* 15: brwhite  */
-	"#cccccc", /* 16: */
-	"#555555", /* 17: */
-	[255] = 0,
-	[256] = "#073642", /*linecolor ist falsch*/
-	[257] = "#fdf6e3",
  };
 
 /*
@@ -147,7 +143,7 @@ const char *altcolorname[] = {
 unsigned int defaultfg = 257; /* 12*/
 unsigned int defaultbg = 256; /* 8 */
 unsigned int defaultcs = 257; /* 14*/
-unsigned int defaultrcs = 1; /* 15 */
+unsigned int defaultrcs = 256; /* 15 */
 
 /*
  * Default shape of cursor
@@ -186,12 +182,16 @@ MouseShortcut mshortcuts[] = {
 	/* button               mask            string */
 	{ Button4,              XK_NO_MOD,      "\031" },
 	{ Button5,              XK_NO_MOD,      "\005" },
+	{ Button4,              ShiftMask,      "\031[2~" },
+	{ Button5,              ShiftMask,      "\005[3~" },
 };
 
 MouseKey mkeys[] = {
 	/* button               mask            function        argument */
 	{ Button4,              XK_NO_MOD,      kscrollup,      {.i =  1} },
 	{ Button5,              XK_NO_MOD,      kscrolldown,    {.i =  1} },
+	{ Button4,              ShiftMask,      zoom,      {.f =  1} },
+	{ Button5,              ShiftMask,      zoom,    {.f =  -1} },
 };
 
 /* Internal keyboard shortcuts. */
@@ -204,17 +204,19 @@ Shortcut shortcuts[] = {
 	{ ControlMask,          XK_Print,       toggleprinter,  {.i =  0} },
 	{ ShiftMask,            XK_Print,       printscreen,    {.i =  0} },
 	{ XK_ANY_MOD,           XK_Print,       printsel,       {.i =  0} },
-	{ TERMMOD,              XK_Prior,       zoom,           {.f = +1} },
-	{ TERMMOD,              XK_Next,        zoom,           {.f = -1} },
+	{ ShiftMask,              XK_Prior,       zoom,           {.f = +1} },
+	{ ShiftMask,              XK_Next,        zoom,           {.f = -1} },
 	{ TERMMOD,              XK_Home,        zoomreset,      {.f =  0} },
 	{ TERMMOD,              XK_C,           clipcopy,       {.i =  0} },
 	{ TERMMOD,              XK_V,           clippaste,      {.i =  0} },
+	{ ShiftMask,            XK_Insert,      clippaste,      {.i =  0} },
+	{ TERMMOD,              XK_Insert,      selpaste,       {.i =  0} },
 	{ TERMMOD,              XK_Y,           selpaste,       {.i =  0} },
 	{ TERMMOD,              XK_Num_Lock,    numlock,        {.i =  0} },
 	{ TERMMOD,              XK_I,           iso14755,       {.i =  0} },
-	{ XK_ANY_MOD,           XK_F6,          swapcolors,      {.i = 0} },
-	{ ShiftMask,            XK_Page_Up,     kscrollup,      {.i = -1} },
-	{ ShiftMask,            XK_Page_Down,   kscrolldown,    {.i = -1} },
+	{ XK_ANY_MOD,           XK_F6,          swapcolors,     {.i =  0} },
+	{ ControlMask,            XK_Page_Up,     kscrollup,      {.i = -1} },
+	{ ControlMask,            XK_Page_Down,   kscrolldown,    {.i = -1} },
 };
 
 /*
