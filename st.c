@@ -1629,6 +1629,10 @@ tsetmode(int priv, int set, int *args, int narg)
 			case 1005: /* UTF-8 mouse mode; will confuse
 				      applications not supporting UTF-8
 				      and luit. */
+				fprintf(stderr,
+					"erresc: confused UTF-8 mouse mode;private set/reset: %d\n",
+					*args);
+				break;
 			case 1015: /* urxvt mangled mouse mode; incompatible
 				      and can be mistaken for other control
 				      codes. */
