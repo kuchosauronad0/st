@@ -5,7 +5,7 @@
  *
  * font: see http://freedesktop.org/software/fontconfig/fontconfig-user.html
  */
-char font[] = "Iosevka Nerd Font Mono:pixelsize=16:antialias=true:autohint=true";
+char font[] = "DejaVu Sans Mono:pixelsize=16:antialias=true:autohint=true";
 int borderpx = 3;
 
 /*
