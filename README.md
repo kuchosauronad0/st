@@ -8,4 +8,5 @@
 * delkey
 * bsd fix
 * scrollback
+* mouse zoom
 
